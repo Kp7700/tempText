@@ -1,0 +1,6 @@
+{
+  "name": "TempText",
+  "description": "Create and share temporary, private text notes with self-expiring links.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

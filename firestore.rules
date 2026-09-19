@@ -1,0 +1,31 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Temporary Texts collection
+    match /temporaryTexts/{textId} {
+      // Only permit individual document lookup (get), strictly when the document has not expired.
+      // List and query scans are explicitly denied to protect privacy and prevent link enumeration.
+      allow get: if resource != null && resource.data.expiresAt > request.time;
+      allow list: if false;
+      
+      // Allow unauthenticated creation with strict validation:
+      // 1. Must match document ID in path
+      // 2. Text must be non-empty string within max character length (50,000 chars)
+      // 3. Duration must be a recognized duration label
+      // 4. Timestamps must be valid Firestore timestamps with expiresAt in the future
+      allow create: if request.resource.data.id == textId
+                   && request.resource.data.text is string
+                   && request.resource.data.text.size() > 0
+                   && request.resource.data.text.size() <= 50000
+                   && request.resource.data.duration is string
+                   && request.resource.data.createdAt is timestamp
+                   && request.resource.data.expiresAt is timestamp
+                   && request.resource.data.expiresAt > request.time;
+      
+      // Updates and client-side deletions are disallowed
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}

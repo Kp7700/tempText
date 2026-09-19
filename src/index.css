@@ -1,0 +1,177 @@
+@import "tailwindcss";
+
+/* Markdown Content Typography & Styling */
+.temptext-markdown {
+  font-family: inherit;
+  line-height: 1.7;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.temptext-markdown h1 {
+  font-size: 1.85rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid rgba(125, 125, 125, 0.2);
+}
+
+.temptext-markdown h1:first-child {
+  margin-top: 0;
+}
+
+.temptext-markdown h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin-top: 1.35rem;
+  margin-bottom: 0.65rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid rgba(125, 125, 125, 0.15);
+}
+
+.temptext-markdown h2:first-child {
+  margin-top: 0;
+}
+
+.temptext-markdown h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 1.15rem;
+  margin-bottom: 0.5rem;
+}
+
+.temptext-markdown h3:first-child {
+  margin-top: 0;
+}
+
+.temptext-markdown h4,
+.temptext-markdown h5,
+.temptext-markdown h6 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.temptext-markdown p {
+  margin-top: 0;
+  margin-bottom: 0.9rem;
+}
+
+.temptext-markdown strong,
+.temptext-markdown b {
+  font-weight: 700;
+}
+
+.temptext-markdown em,
+.temptext-markdown i {
+  font-style: italic;
+}
+
+.temptext-markdown ul {
+  list-style-type: disc;
+  padding-left: 1.6rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.9rem;
+}
+
+.temptext-markdown ol {
+  list-style-type: decimal;
+  padding-left: 1.6rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.9rem;
+}
+
+.temptext-markdown li {
+  margin-bottom: 0.35rem;
+  line-height: 1.6;
+}
+
+.temptext-markdown li > p {
+  margin-bottom: 0.25rem;
+}
+
+.temptext-markdown blockquote {
+  margin: 1rem 0;
+  padding: 0.6rem 1.15rem;
+  border-left: 4px solid #6366f1;
+  background-color: rgba(99, 102, 241, 0.06);
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+}
+
+.temptext-markdown blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.temptext-markdown code {
+  font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+  font-size: 0.88em;
+  padding: 0.2em 0.45em;
+  border-radius: 6px;
+  background-color: rgba(125, 125, 125, 0.15);
+}
+
+.temptext-markdown pre {
+  margin: 1rem 0;
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  background-color: rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(125, 125, 125, 0.18);
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+[data-mui-color-scheme="dark"] .temptext-markdown pre,
+.dark .temptext-markdown pre {
+  background-color: rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.temptext-markdown pre code {
+  padding: 0;
+  background-color: transparent;
+  font-size: inherit;
+  border-radius: 0;
+}
+
+.temptext-markdown hr {
+  margin: 1.5rem 0;
+  border: 0;
+  border-top: 1px solid rgba(125, 125, 125, 0.2);
+}
+
+.temptext-markdown a {
+  color: #4f46e5;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.temptext-markdown a:hover {
+  color: #6366f1;
+}
+
+.temptext-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.temptext-markdown th,
+.temptext-markdown td {
+  border: 1px solid rgba(125, 125, 125, 0.2);
+  padding: 0.5rem 0.85rem;
+  text-align: left;
+}
+
+.temptext-markdown th {
+  background-color: rgba(125, 125, 125, 0.08);
+  font-weight: 600;
+}
+
