@@ -5,8 +5,9 @@ service cloud.firestore {
     // Temporary Texts collection
     match /temporaryTexts/{textId} {
       // Only permit individual document lookup (get), strictly when the document has not expired.
+      // Also permit checking non-existent document IDs for collision avoidance.
       // List and query scans are explicitly denied to protect privacy and prevent link enumeration.
-      allow get: if resource != null && resource.data.expiresAt > request.time;
+      allow get: if resource == null || resource.data.expiresAt > request.time;
       allow list: if false;
       
       // Allow unauthenticated creation with strict validation:

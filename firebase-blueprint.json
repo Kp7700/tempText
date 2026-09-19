@@ -1,0 +1,44 @@
+{
+  "entities": {
+    "TemporaryText": {
+      "title": "TemporaryText",
+      "description": "A temporary text snippet that self-destructs after a specified duration",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique URL-safe link identifier",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "text": {
+          "type": "string",
+          "description": "Content of the temporary text",
+          "minLength": 1,
+          "maxLength": 50000
+        },
+        "duration": {
+          "type": "string",
+          "description": "Expiration duration label (e.g., 5m, 30m, 1h, 8h, 1d, 7d, 1mo, 6mo, 1y)"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Expiration timestamp"
+        }
+      },
+      "required": ["id", "text", "duration", "createdAt", "expiresAt"]
+    }
+  },
+  "firestore": {
+    "/temporaryTexts/{textId}": {
+      "schema": "TemporaryText",
+      "description": "Collection storing temporary text snippets"
+    }
+  }
+}

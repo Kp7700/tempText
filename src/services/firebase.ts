@@ -61,29 +61,80 @@ const customDbId =
 export const db: Firestore = customDbId ? getFirestore(app, customDbId) : getFirestore(app);
 
 /**
- * Generate a cryptographically strong, unpredictable random ID.
- * Produces a 22-character URL-safe string.
+ * URL-safe character set containing uppercase letters, lowercase letters, and numbers (62 chars).
+ * Requirement: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
  */
-export function generateSecureId(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-  const array = new Uint8Array(20);
-  if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
-    window.crypto.getRandomValues(array);
-  } else {
-    for (let i = 0; i < array.length; i++) {
-      array[i] = Math.floor(Math.random() * 256);
+export const SHORT_ID_CHARSET =
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+export const SHORT_ID_LENGTH = 7;
+
+/**
+ * Generate a cryptographically secure random ID of exactly 7 characters.
+ * Uses browser/runtime crypto.getRandomValues with rejection sampling to eliminate modulo bias.
+ * Does not use predictable sequential IDs or timestamps.
+ */
+export function generateShortId(length = SHORT_ID_LENGTH): string {
+  const chars = SHORT_ID_CHARSET;
+  const charsLength = chars.length; // 62
+  // Discard bytes >= 248 (256 - (256 % 62)) to prevent modulo bias for uniform randomness
+  const maxValidByte = 256 - (256 % charsLength);
+
+  let result = '';
+  const cryptoObj =
+    typeof window !== 'undefined'
+      ? window.crypto || (window as unknown as { msCrypto?: Crypto }).msCrypto
+      : globalThis.crypto;
+
+  while (result.length < length) {
+    const buffer = new Uint8Array(length * 2);
+    if (cryptoObj && typeof cryptoObj.getRandomValues === 'function') {
+      cryptoObj.getRandomValues(buffer);
+    } else {
+      for (let i = 0; i < buffer.length; i++) {
+        buffer[i] = Math.floor(Math.random() * 256);
+      }
+    }
+
+    for (let i = 0; i < buffer.length && result.length < length; i++) {
+      const byte = buffer[i];
+      if (byte < maxValidByte) {
+        result += chars[byte % charsLength];
+      }
     }
   }
 
-  let result = '';
-  for (let i = 0; i < array.length; i++) {
-    result += chars[array[i] % chars.length];
-  }
   return result;
+}
+
+// Backward-compatible alias for any legacy references
+export const generateSecureId = generateShortId;
+
+/**
+ * Checks Firestore to see if a document with the candidate ID already exists.
+ * Returns true if the ID is already in use (collision), false if available.
+ */
+export async function checkIfIdExists(id: string): Promise<boolean> {
+  try {
+    const docRef = doc(db, 'temporaryTexts', id);
+    const docSnap = await getDoc(docRef);
+    return docSnap.exists();
+  } catch (err: unknown) {
+    const errorObj = err as { code?: string; message?: string };
+    // If Firestore security rules return permission-denied (e.g., an existing expired document),
+    // treat it as occupied/collision to avoid overwriting or key collisions.
+    if (errorObj?.code === 'permission-denied') {
+      return true;
+    }
+    // For other unexpected errors, log and continue or return true for safety
+    console.warn(`Error during collision check for ID "${id}":`, err);
+    return false;
+  }
 }
 
 /**
  * Stores temporary text record in Firestore and returns shareable link information.
+ * Uses a unique 7-character short ID verified against Firestore for collisions.
  */
 export async function createTemporaryTextRecord(
   text: string,
@@ -98,7 +149,22 @@ export async function createTemporaryTextRecord(
     throw new Error(`Text exceeds maximum allowed length of ${MAX_TEXT_LENGTH.toLocaleString()} characters.`);
   }
 
-  const id = generateSecureId();
+  // Generate a unique 7-character ID, verifying against Firestore to prevent collisions
+  let id = '';
+  const MAX_COLLISION_RETRIES = 10;
+  for (let attempt = 0; attempt < MAX_COLLISION_RETRIES; attempt++) {
+    const candidateId = generateShortId(SHORT_ID_LENGTH);
+    const exists = await checkIfIdExists(candidateId);
+    if (!exists) {
+      id = candidateId;
+      break;
+    }
+  }
+
+  if (!id) {
+    throw new Error('Failed to generate a unique short link ID. Please try again.');
+  }
+
   const startDate = new Date();
   const expiresAtDate = calculateExpirationDate(duration, startDate);
   const durationOption = getDurationOption(duration);

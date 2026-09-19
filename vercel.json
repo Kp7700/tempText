@@ -3,6 +3,10 @@
     {
       "source": "/t/:id",
       "destination": "/"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/"
     }
   ]
 }
